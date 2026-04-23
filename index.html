@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Control de Entregables IDU</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;font-size:14px;color:#222;background:#f5f5f5}
+.app{max-width:1200px;margin:0 auto;padding:1rem}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;flex-wrap:wrap;gap:8px;background:#fff;padding:12px 16px;border-radius:10px;border:1px solid #e0e0e0}
+.header-left{display:flex;align-items:center;gap:10px}
+.logo{width:38px;height:38px;background:#185FA5;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:12px;flex-shrink:0}
+.title{font-size:17px;font-weight:700;color:#185FA5}
+.subtitle{font-size:11px;color:#666}
+.hdr-right{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.btn{padding:6px 14px;border-radius:7px;border:1px solid #ccc;background:#fff;color:#333;font-size:12px;cursor:pointer;font-weight:500}
+.btn:hover{background:#f0f0f0}
+.btn-primary{background:#185FA5;color:#fff;border-color:#185FA5}
+.btn-primary:hover{background:#0C447C}
+select.ctl{font-size:12px;padding:5px 8px;border-radius:7px;border:1px solid #ccc;background:#fff;color:#333;cursor:pointer}
+.contract-bar{background:#EBF3FB;border-radius:8px;padding:8px 14px;margin-bottom:1rem;display:flex;gap:16px;flex-wrap:wrap;font-size:11px;border:1px solid #B5D4F4}
+.contract-bar span{color:#666}
+.contract-bar strong{color:#185FA5}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin-bottom:1rem}
+.metric{background:#fff;border-radius:8px;padding:10px 14px;border:1px solid #e0e0e0}
+.metric-lbl{font-size:10px;color:#888;margin-bottom:3px}
+.metric-val{font-size:22px;font-weight:700}
+.mv-blue{color:#185FA5}.mv-green{color:#3B6D11}.mv-amber{color:#BA7517}.mv-red{color:#A32D2D}.mv-gray{color:#666}
+.stages{display:flex;gap:5px;margin-bottom:.8rem;overflow-x:auto;padding-bottom:4px}
+.stab{padding:7px 14px;border-radius:7px;border:1px solid #ddd;background:#fff;color:#666;font-size:12px;cursor:pointer;white-space:nowrap;flex-shrink:0;font-weight:500}
+.stab:hover{border-color:#185FA5;color:#185FA5}
+.stab.active{background:#185FA5;border-color:#185FA5;color:#fff;font-weight:700}
+.prog-row{display:flex;align-items:center;gap:8px;margin-bottom:1rem}
+.prog-bar{flex:1;height:6px;background:#e0e0e0;border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;background:#185FA5;border-radius:3px;transition:width .3s}
+.prog-lbl{font-size:11px;color:#666;min-width:40px;text-align:right;font-weight:600}
+.filters{display:flex;gap:8px;margin-bottom:.8rem;flex-wrap:wrap;align-items:center;background:#fff;padding:8px 12px;border-radius:8px;border:1px solid #e0e0e0}
+.filters label{font-size:11px;color:#666;font-weight:600}
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.sec-title{font-size:14px;font-weight:700;color:#185FA5}
+.tbl-wrap{border:1px solid #e0e0e0;border-radius:10px;overflow:hidden;margin-bottom:1.2rem;overflow-x:auto;background:#fff}
+table{width:100%;border-collapse:collapse;min-width:750px}
+th{background:#f0f4f8;font-size:11px;font-weight:700;color:#555;padding:8px 10px;text-align:left;border-bottom:1px solid #e0e0e0}
+td{padding:7px 10px;font-size:11px;color:#333;border-bottom:1px solid #f0f0f0;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#f9fbff}
+.area-badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700}
+.area-TECNICA{background:#dbeafe;color:#1e40af}
+.area-AMBIENTAL{background:#dcfce7;color:#166534}
+.area-SST{background:#fef9c3;color:#854d0e}
+.area-FORESTAL{background:#d1fae5;color:#065f46}
+.area-CIUDADANO{background:#ede9fe;color:#5b21b6}
+.area-ARQUEOLOGIA{background:#fee2e2;color:#991b1b}
+.area-PMT{background:#fce7f3;color:#9d174d}
+.area-MAQUINARIA{background:#f3f4f6;color:#374151}
+.area-CALIDAD{background:#dbeafe;color:#1d4ed8}
+.area-BIOTICO{background:#d1fae5;color:#065f46}
+.area-GENERAL{background:#f3f4f6;color:#4b5563}
+.area-ADMINISTRATIVA{background:#fef3c7;color:#92400e}
+select.est-sel{font-size:11px;padding:3px 5px;border-radius:5px;border:1px solid #ccc;background:#fff;cursor:pointer;min-width:95px}
+input.fi{font-size:11px;padding:3px 5px;border-radius:5px;border:1px solid #ccc;background:#fff;width:100%}
+.av{color:#BA7517;font-size:9px;font-weight:600}.avc{color:#A32D2D;font-size:9px;font-weight:600}
+.del-btn{background:none;border:none;cursor:pointer;color:#aaa;font-size:13px;padding:2px 5px;border-radius:4px;font-weight:700}
+.del-btn:hover{color:#dc2626;background:#fee2e2}
+.group-hdr td{background:#f0f4f8;font-size:11px;font-weight:700;color:#185FA5;padding:6px 10px;border-bottom:1px solid #e0e0e0}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:1000}
+.modal{background:#fff;border-radius:12px;padding:1.5rem;width:460px;max-width:95vw;border:1px solid #e0e0e0;max-height:90vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,0.18)}
+.modal h3{font-size:16px;font-weight:700;margin-bottom:1rem;color:#185FA5}
+.fg{margin-bottom:10px}
+.fg label{font-size:11px;color:#666;display:block;margin-bottom:3px;font-weight:600}
+.fg input,.fg select,.fg textarea{width:100%;padding:7px 10px;border-radius:7px;border:1px solid #ccc;font-size:12px;color:#333}
+.fg textarea{height:55px;resize:vertical}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mf{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}
+.export-btn{background:#27500A;color:#fff;border-color:#27500A}
+.export-btn:hover{background:#3B6D11}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="header">
+  <div class="header-left">
+    <div class="logo">IDU</div>
+    <div><div class="title">Control de Entregables IDU</div><div class="subtitle">Infraestructura Vial · Contratos IDU Bogotá</div></div>
+  </div>
+  <div class="hdr-right">
+    <select class="ctl" id="contractSel" onchange="selContract(this.value)"></select>
+    <button class="btn btn-primary" onclick="openNewContract()">+ Contrato</button>
+    <button class="btn export-btn" onclick="exportCSV()">&#8595; Exportar CSV</button>
+  </div>
+</div>
+
+<div class="contract-bar" id="contractBar"></div>
+<div class="metrics" id="metrics"></div>
+<div class="stages" id="stageTabs"></div>
+<div class="prog-row"><div class="prog-bar"><div class="prog-fill" id="progFill"></div></div><div class="prog-lbl" id="progLbl">0%</div></div>
+
+<div class="filters">
+  <label>Área:</label>
+  <select class="ctl" id="filterArea" onchange="renderTable()"><option value="">Todas</option></select>
+  <label style="margin-left:8px">Estado:</label>
+  <select class="ctl" id="filterEstado" onchange="renderTable()">
+    <option value="">Todos</option>
+    <option>Pendiente</option><option>En Revisión</option><option>Radicado</option><option>Aprobado</option><option>Rechazado</option>
+  </select>
+  <label style="margin-left:8px">Destinatario:</label>
+  <select class="ctl" id="filterDest" onchange="renderTable()">
+    <option value="">Todos</option>
+    <option>Interventoría</option><option>IDU</option><option>Otra Entidad / ESP</option>
+  </select>
+</div>
+
+<div class="sec-hdr">
+  <div class="sec-title" id="stageTitle"></div>
+  <button class="btn btn-primary" onclick="openNewEntregable()">+ Entregable</button>
+</div>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr>
+  <th style="width:30%">Entregable</th>
+  <th style="width:10%">Área</th>
+  <th style="width:10%">Destinatario</th>
+  <th style="width:13%">Estado</th>
+  <th style="width:11%">Fecha límite</th>
+  <th style="width:13%">Radicado / Doc.</th>
+  <th style="width:10%">Observaciones</th>
+  <th style="width:3%"></th>
+</tr></thead>
+<tbody id="tBody"></tbody>
+</table>
+</div>
+</div>
+<div id="modalArea"></div>
+
+<script>
+const STAGES=[
+  {id:'pre',label:'Preliminares / Preconstrucción'},
+  {id:'con',label:'Construcción'},
+  {id:'rec',label:'Recibo de Obra'},
+  {id:'acta',label:'Acta Recibo Final'},
+  {id:'liq',label:'Liquidación'}
+];
+const DESTS=['Interventoría','IDU','Otra Entidad / ESP'];
+const ESTADOS=['Pendiente','En Revisión','Radicado','Aprobado','Rechazado'];
+const AREAS=['TECNICA','AMBIENTAL','SST','FORESTAL','CIUDADANO','ARQUEOLOGIA','PMT','MAQUINARIA','CALIDAD','BIOTICO','GENERAL','ADMINISTRATIVA'];
+
+const BASE={
+  pre:[
+    {n:'Acta de inicio del contrato suscrita (IDU, contratista, interventoría)',a:'ADMINISTRATIVA',d:'IDU'},
+    {n:'Pólizas y garantías contractuales constituidas y aprobadas por IDU',a:'ADMINISTRATIVA',d:'IDU'},
+    {n:'Certificado de disponibilidad presupuestal y registro presupuestal',a:'ADMINISTRATIVA',d:'IDU'},
+    {n:'Apertura y presentación cuenta bancaria exclusiva del contrato / anticipo',a:'ADMINISTRATIVA',d:'Interventoría'},
+    {n:'Plan de inversión del anticipo aprobado por interventoría',a:'ADMINISTRATIVA',d:'Interventoría'},
+    {n:'Afiliaciones sistema de seguridad social y parafiscales personal vinculado',a:'ADMINISTRATIVA',d:'Interventoría'},
+    {n:'Hoja de vida y soportes personal mínimo requerido (director, residente, especialistas)',a:'ADMINISTRATIVA',d:'Interventoría'},
+    {n:'Revisión y evaluación de estudios y diseños entregados por IDU',a:'TECNICA',d:'Interventoría'},
+    {n:'Pronunciamiento escrito sobre estudios y diseños (observaciones técnicas)',a:'TECNICA',d:'Interventoría'},
+    {n:'Programa detallado de trabajo (PDT) con cronograma de actividades e inversiones',a:'TECNICA',d:'Interventoría'},
+    {n:'Memoria de cálculo y metodología constructiva propuesta',a:'TECNICA',d:'Interventoría'},
+    {n:'Planos de implantación y localización aprobados',a:'TECNICA',d:'IDU'},
+    {n:'FOCI-55 Lista de chequeo requisitos mínimos previos inicio de actividades en frentes de obra',a:'TECNICA',d:'Interventoría'},
+    {n:'Programa de suministro de materiales y equipos',a:'TECNICA',d:'Interventoría'},
+    {n:'Diseños específicos ajustados / complementados (si aplica) aprobados por interventoría',a:'TECNICA',d:'Interventoría'},
+    {n:'Plan de manejo de tráfico (PMT) elaborado y aprobado por SDM',a:'PMT',d:'Otra Entidad / ESP'},
+    {n:'Radicación PMT ante Secretaría Distrital de Movilidad (SDM)',a:'PMT',d:'Otra Entidad / ESP'},
+    {n:'Aprobación PMT por parte de SDM (resolución o comunicado)',a:'PMT',d:'Otra Entidad / ESP'},
+    {n:'Plan de señalización y desvíos provisional aprobado',a:'PMT',d:'Interventoría'},
+    {n:'Manual de Manejo Ambiental de Obra (MAO) presentado y aprobado',a:'AMBIENTAL',d:'Interventoría'},
+    {n:'Plan de Gestión Integral de Residuos de Construcción y Demolición (PGIRCD)',a:'AMBIENTAL',d:'Interventoría'},
+    {n:'Trámite y obtención de permisos ambientales requeridos (ocupación de cauce, tala, etc.)',a:'AMBIENTAL',d:'Otra Entidad / ESP'},
+    {n:'Plan de manejo de escombros y sitios de disposición final autorizados',a:'AMBIENTAL',d:'Otra Entidad / ESP'},
+    {n:'Registro de vehículos y maquinaria con certificados de emisiones y revisión técnico-mecánica',a:'AMBIENTAL',d:'Interventoría'},
+    {n:'PIN ambiental tramitado ante IDU',a:'AMBIENTAL',d:'IDU'},
+    {n:'Plan de Seguridad y Salud en el Trabajo (PSST / SG-SST) aprobado',a:'SST',d:'Interventoría'},
+    {n:'Exámenes médicos de ingreso y aptitud de todo el personal vinculado',a:'SST',d:'Interventoría'},
+    {n:'Elementos de protección personal (EPP) verificados y entregados',a:'SST',d:'Interventoría'},
+    {n:'Programa de trabajo en alturas y certificaciones vigentes del personal',a:'SST',d:'Interventoría'},
+    {n:'Inscripción en aplicativo ZIPA – componente SST',a:'SST',d:'IDU'},
+    {n:'Inventario forestal del área de intervención presentado a interventoría',a:'FORESTAL',d:'Interventoría'},
+    {n:'Solicitud y obtención de permisos silviculturales ante SDA',a:'FORESTAL',d:'Otra Entidad / ESP'},
+    {n:'Plan de manejo forestal y diseño paisajístico aprobado por JBB / SDA',a:'FORESTAL',d:'Otra Entidad / ESP'},
+    {n:'Actas de vecindad de inicio levantadas para predios del área de influencia',a:'CIUDADANO',d:'Interventoría'},
+    {n:'Programa de gestión social presentado y aprobado (Apéndice H)',a:'CIUDADANO',d:'Interventoría'},
+    {n:'Punto IDU instalado y operando',a:'CIUDADANO',d:'IDU'},
+    {n:'Directorio de instituciones y actores sociales del área de influencia',a:'CIUDADANO',d:'Interventoría'},
+    {n:'Piezas comunicativas de inicio (plegable, volantes) aprobadas y distribuidas',a:'CIUDADANO',d:'IDU'},
+    {n:'Valla informativa de obra instalada y aprobada',a:'CIUDADANO',d:'IDU'},
+    {n:'Registro en plataforma BACHUÉ – componente social',a:'CIUDADANO',d:'IDU'},
+    {n:'Diagnóstico y prospección arqueológica (ICANH)',a:'ARQUEOLOGIA',d:'Otra Entidad / ESP'},
+    {n:'Formulación y aprobación del Plan de Manejo Arqueológico (PMA) por ICANH',a:'ARQUEOLOGIA',d:'Otra Entidad / ESP'},
+    {n:'Listado de maquinaria, vehículos y equipos aprobado por interventoría',a:'MAQUINARIA',d:'Interventoría'},
+    {n:'FOAC-43 Traslado y movilización de maquinaria al frente de obra',a:'MAQUINARIA',d:'Interventoría'},
+    {n:'FOAC-45 Preoperacionales de maquinaria diligenciados antes del inicio',a:'MAQUINARIA',d:'Interventoría'},
+    {n:'FOAC-47 Preoperacionales de vehículos diligenciados antes del inicio',a:'MAQUINARIA',d:'Interventoría'},
+  ],
+  con:[
+    {n:'Actas de comité de obra (semanales/quincenales) con compromisos y seguimiento',a:'ADMINISTRATIVA',d:'IDU'},
+    {n:'Informes mensuales de avance de obra (N°1 al N°26) aprobados por interventoría',a:'ADMINISTRATIVA',d:'Interventoría'},
+    {n:'Informes semanales de avance cargados en ZIPA / plataforma IDU',a:'ADMINISTRATIVA',d:'Interventoría'},
+    {n:'Actas de obras adicionales, complementarias o imprevistas aprobadas',a:'ADMINISTRATIVA',d:'IDU'},
+    {n:'Actas de modificación de cantidades de obra',a:'ADMINISTRATIVA',d:'IDU'},
+    {n:'Actualización y aprobación de pólizas contractuales durante la ejecución',a:'ADMINISTRATIVA',d:'IDU'},
+    {n:'Informes de buen manejo y amortización del anticipo (con extractos bancarios)',a:'ADMINISTRATIVA',d:'Interventoría'},
+    {n:'Actas parciales de obra (corte mensual para pago) aprobadas por interventoría',a:'ADMINISTRATIVA',d:'Interventoría'},
+    {n:'Actualización periódica del Programa Detallado de Trabajo (PDT)',a:'TECNICA',d:'Interventoría'},
+    {n:'Control topográfico y replanteo de obras en campo',a:'TECNICA',d:'Interventoría'},
+    {n:'Memorias de cálculo de cantidades de obra ejecutadas por corte',a:'TECNICA',d:'Interventoría'},
+    {n:'Bitácora Digital de Obra (DGO) diligenciada diariamente',a:'TECNICA',d:'Interventoría'},
+    {n:'Registro fotográfico semanal del avance por frente de obra',a:'TECNICA',d:'Interventoría'},
+    {n:'Planos de detalle constructivo y ajustes de diseño en obra (si aplica)',a:'TECNICA',d:'Interventoría'},
+    {n:'Plan de calidad de obra aprobado por interventoría',a:'CALIDAD',d:'Interventoría'},
+    {n:'Ensayos de laboratorio y campo de materiales (suelos, pavimento, concreto)',a:'CALIDAD',d:'Interventoría'},
+    {n:'Certificados de calidad de materiales pétreos, asfalto, concreto, acero',a:'CALIDAD',d:'Interventoría'},
+    {n:'Informes mensuales de calidad aprobados por interventoría',a:'CALIDAD',d:'Interventoría'},
+    {n:'Informes de control de compactación y densidades',a:'CALIDAD',d:'Interventoría'},
+    {n:'Informes de resistencia de concretos y mezclas asfálticas',a:'CALIDAD',d:'Interventoría'},
+    {n:'Actualización del PMT por cambio de frente o etapa constructiva',a:'PMT',d:'Otra Entidad / ESP'},
+    {n:'Informes mensuales de PMT, señalización y desvíos aprobados',a:'PMT',d:'Interventoría'},
+    {n:'Verificación cumplimiento lineamientos SDM en campo',a:'PMT',d:'Interventoría'},
+    {n:'Informe mensual ambiental y SST (FOAC-25) aprobado por interventoría',a:'AMBIENTAL',d:'Interventoría'},
+    {n:'FOAC-21 Seguimiento aprovechamiento de RCD (mensual)',a:'AMBIENTAL',d:'Interventoría'},
+    {n:'Certificados de disposición final de RCD en sitios autorizados (mensual)',a:'AMBIENTAL',d:'Otra Entidad / ESP'},
+    {n:'FOAC-32 Fichas de seguimiento de labores ambientales',a:'AMBIENTAL',d:'Interventoría'},
+    {n:'Informe de cumplimiento actos administrativos ambientales',a:'AMBIENTAL',d:'Interventoría'},
+    {n:'Certificados de mantenimiento de baños móviles (cada 15 días)',a:'AMBIENTAL',d:'Otra Entidad / ESP'},
+    {n:'Reporte PIN ambiental – actualización mensual',a:'AMBIENTAL',d:'IDU'},
+    {n:'Informe mensual SST cargado en aplicativo ZIPA',a:'SST',d:'IDU'},
+    {n:'FOAC-83 Reporte mensual de personal vinculado al contrato',a:'SST',d:'Interventoría'},
+    {n:'FOAC-102 / FOAC-103 Paz y salvo mensual de personal',a:'SST',d:'Interventoría'},
+    {n:'FOAC-104 Cumplimiento plan de trabajo y personal vinculado mensual',a:'SST',d:'Interventoría'},
+    {n:'Registro de accidentes e incidentes laborales (mensual)',a:'SST',d:'Interventoría'},
+    {n:'Certificados de parafiscales de subcontratistas (mensual)',a:'SST',d:'Interventoría'},
+    {n:'Informe mensual de gestión forestal aprobado por interventoría',a:'FORESTAL',d:'Interventoría'},
+    {n:'Ejecución de actividades silviculturales autorizadas (traslados, podas, talas)',a:'FORESTAL',d:'Otra Entidad / ESP'},
+    {n:'Informe de plantaciones y mantenimiento de arbolado en SIGAU',a:'FORESTAL',d:'Otra Entidad / ESP'},
+    {n:'Registro fotográfico mensual de gestión forestal y zonas verdes',a:'FORESTAL',d:'Interventoría'},
+    {n:'Informe mensual componente diálogo ciudadano y comunicación (Apéndice H)',a:'CIUDADANO',d:'Interventoría'},
+    {n:'Informe semanal social cargado en plataforma BACHUÉ',a:'CIUDADANO',d:'IDU'},
+    {n:'Atención y cierre de PQRSD recepcionadas durante la construcción',a:'CIUDADANO',d:'IDU'},
+    {n:'Reuniones de comité IDU (bimensual/mensual según contrato)',a:'CIUDADANO',d:'IDU'},
+    {n:'Entrega piezas comunicativas de avance de obra a la comunidad',a:'CIUDADANO',d:'IDU'},
+    {n:'Punto(s) satélite(s) de información operando según Apéndice H',a:'CIUDADANO',d:'IDU'},
+    {n:'Implementación del Plan de Manejo Arqueológico (PMA) en frentes de excavación',a:'ARQUEOLOGIA',d:'Otra Entidad / ESP'},
+    {n:'Informes de seguimiento componente arqueológico (mensual)',a:'ARQUEOLOGIA',d:'Otra Entidad / ESP'},
+    {n:'FOAC-108 Gestión mensual componente MEV (indicadores maquinaria y vehículos)',a:'MAQUINARIA',d:'Interventoría'},
+    {n:'FOAC-45 Preoperacionales diarios de maquinaria activa',a:'MAQUINARIA',d:'Interventoría'},
+    {n:'FOAC-47 Preoperacionales diarios de vehículos activos',a:'MAQUINARIA',d:'Interventoría'},
+    {n:'Mantenimientos preventivos y correctivos de maquinaria (registros)',a:'MAQUINARIA',d:'Interventoría'},
+    {n:'Informe mensual componente biótico aprobado por interventoría',a:'BIOTICO',d:'Interventoría'},
+    {n:'Actividades de manejo de fauna silvestre ejecutadas (formatos soporte)',a:'BIOTICO',d:'Interventoría'},
+  ],
+  rec:[
+    {n:'Solicitud de recibo de obra presentada a interventoría',a:'TECNICA',d:'Interventoría'},
+    {n:'Informe final de obra ejecutada',a:'TECNICA',d:'IDU'},
+    {n:'Planos récord (as built)',a:'TECNICA',d:'IDU'},
+    {n:'Certificados de calidad de materiales',a:'CALIDAD',d:'Interventoría'},
+    {n:'Informe de gestión ambiental final',a:'AMBIENTAL',d:'IDU'},
+    {n:'Paz y salvo proveedores y subcontratistas',a:'ADMINISTRATIVA',d:'IDU'},
+    {n:'Registro fotográfico final de obra',a:'TECNICA',d:'Interventoría'},
+  ],
+  acta:[
+    {n:'Resumen de cantidades conciliadas en actas parciales con memorias de cálculo',a:'TECNICA',d:'IDU'},
+    {n:'Subsanación pendientes conciliados en el acta de terminación',a:'TECNICA',d:'Interventoría'},
+    {n:'Informe de subsanación al acta de terminación con observaciones',a:'TECNICA',d:'Interventoría'},
+    {n:'Compilado de informes mensuales de ejecución (hasta informe 26) aprobados por interventoría',a:'GENERAL',d:'Interventoría'},
+    {n:'Carpeta contractual (actas radicadas, otrosí modificatorios, etc.)',a:'ADMINISTRATIVA',d:'IDU'},
+    {n:'Pólizas contractuales suscritas en la ejecución del proyecto',a:'ADMINISTRATIVA',d:'IDU'},
+    {n:'Manual de mantenimiento',a:'TECNICA',d:'IDU'},
+    {n:'Acta de recibo final de obra (3%)',a:'TECNICA',d:'IDU'},
+  ],
+  liq:[
+    {n:'Manual de mantenimiento',a:'TECNICA',d:'IDU'},
+    {n:'Radicación (no aplica cesión derechos económicos)',a:'TECNICA',d:'IDU'},
+    {n:'Entrega Planos SIG-CAD Obra',a:'TECNICA',d:'Interventoría'},
+    {n:'Revisión y aprobación Interventoría Planos SIG-CAD',a:'TECNICA',d:'Interventoría'},
+    {n:'Entrega Planos SIG-CAD a IDU para aprobación',a:'TECNICA',d:'IDU'},
+    {n:'Aprobación Planos SIG-CAD Obra (Comunicado de Aprobación)',a:'TECNICA',d:'IDU'},
+    {n:'Informe Final Componente Técnico',a:'TECNICA',d:'IDU'},
+    {n:'FOIN ETB – FOIN-07, FOIN-08, FOIN-09 y FOIN-10 con anexos',a:'TECNICA',d:'Otra Entidad / ESP'},
+    {n:'FOIN EAAB – FOIN-07, FOIN-08, FOIN-09 y FOIN-10 con anexos',a:'TECNICA',d:'Otra Entidad / ESP'},
+    {n:'Radicación solicitud liquidación EAAB',a:'TECNICA',d:'Otra Entidad / ESP'},
+    {n:'Planos Récord DITG de Obra NS030 y NS046',a:'TECNICA',d:'Otra Entidad / ESP'},
+    {n:'Revisión y aprobación Planos DITG por Interventoría',a:'TECNICA',d:'Interventoría'},
+    {n:'Mesas de trabajo EAAB-Z1 verificación y aprobación planos DITG',a:'TECNICA',d:'Otra Entidad / ESP'},
+    {n:'Radicación Planos DITG a EAAB-Z1 para aprobación',a:'TECNICA',d:'Otra Entidad / ESP'},
+    {n:'FOIN ENEL MT – FOIN-07, FOIN-08, FOIN-09 y FOIN-10 con anexos',a:'TECNICA',d:'Otra Entidad / ESP'},
+    {n:'FOIN ENEL AP – FOIN-07, FOIN-08, FOIN-09 y FOIN-10 con anexos',a:'TECNICA',d:'Otra Entidad / ESP'},
+    {n:'FOIN VANTI – FOIN-08, FOIN-09 y FOIN-10 con anexos',a:'TECNICA',d:'Otra Entidad / ESP'},
+    {n:'FOIN TIGO/MOVISTAR – FOIN-07, FOIN-08, FOIN-09 y FOIN-10 con anexos',a:'TECNICA',d:'Otra Entidad / ESP'},
+    {n:'Paz y salvo VANTI',a:'TECNICA',d:'Otra Entidad / ESP'},
+    {n:'Paz y salvo CLARO',a:'TECNICA',d:'Otra Entidad / ESP'},
+    {n:'Paz y salvo MOVISTAR',a:'TECNICA',d:'Otra Entidad / ESP'},
+    {n:'Paz y salvo ENEL MT y AP',a:'TECNICA',d:'Otra Entidad / ESP'},
+    {n:'Paz y salvo EAAB',a:'TECNICA',d:'Otra Entidad / ESP'},
+    {n:'Paz y salvo ETB',a:'TECNICA',d:'Otra Entidad / ESP'},
+    {n:'Diligenciamiento y suscripción Acta de Terminación',a:'TECNICA',d:'IDU'},
+    {n:'Actualización de pólizas con Acta de Terminación y radicación a IDU',a:'TECNICA',d:'IDU'},
+    {n:'Suscripción Acta de Recibo Final de Obra',a:'TECNICA',d:'IDU'},
+    {n:'Actualización de pólizas con Acta de Recibo Final y radicación a IDU',a:'TECNICA',d:'IDU'},
+    {n:'Informe de Estabilidad / Garantías radicado a IDU',a:'TECNICA',d:'IDU'},
+    {n:'Informe Final Señalización y Semaforización SDM',a:'TECNICA',d:'Otra Entidad / ESP'},
+    {n:'Suscripción final Acta de Liquidación – IDU, contratista e interventoría',a:'TECNICA',d:'IDU'},
+    {n:'Informe final gestión ambiental y SST (Manual Único Control IDU vigente)',a:'AMBIENTAL',d:'IDU'},
+    {n:'Archivo fotográfico digital 100 fotos manejo ambiental y SST',a:'AMBIENTAL',d:'Interventoría'},
+    {n:'Informe cumplimiento actos administrativos ambientales',a:'AMBIENTAL',d:'IDU'},
+    {n:'Informe cierre registro valla informativa',a:'AMBIENTAL',d:'IDU'},
+    {n:'Cierre permiso ocupación de cauce',a:'AMBIENTAL',d:'Otra Entidad / ESP'},
+    {n:'Informe final y acta de cierre ambiental y SST (formato IDU vigente)',a:'AMBIENTAL',d:'IDU'},
+    {n:'Cuadro resumen RCD generados mes a mes',a:'AMBIENTAL',d:'IDU'},
+    {n:'Cierre PIN ambiental',a:'AMBIENTAL',d:'IDU'},
+    {n:'Informe Final Componente SST con anexos FOAC-83, 102, 103, 104, 107',a:'SST',d:'Interventoría'},
+    {n:'Ajustes aplicativo ZIPA y atención hallazgos',a:'SST',d:'IDU'},
+    {n:'Informe Final Forestal con plano récord paisajismo actualizado',a:'FORESTAL',d:'IDU'},
+    {n:'Informe final cierre Resoluciones SDA (1079 y 1518)',a:'FORESTAL',d:'Otra Entidad / ESP'},
+    {n:'Acta JBB suscrita con actualización códigos SIGAU',a:'FORESTAL',d:'Otra Entidad / ESP'},
+    {n:'Planos georreferenciados árboles/jardinería (PDF + DWG/KMZ/SHAPE)',a:'FORESTAL',d:'IDU'},
+    {n:'Radicación informe final diálogo ciudadano y comunicación',a:'CIUDADANO',d:'IDU'},
+    {n:'Cierre punto IDU y punto(s) satélite(s)',a:'CIUDADANO',d:'IDU'},
+    {n:'Cierre totalidad de PQRSD',a:'CIUDADANO',d:'IDU'},
+    {n:'Entrega 2015 actas de vecindad de cierre a interventoría',a:'CIUDADANO',d:'Interventoría'},
+    {n:'Suscripción acta de cierre social de obra',a:'CIUDADANO',d:'IDU'},
+    {n:'Plataforma BACHUÉ con todos los soportes para paz y salvo',a:'CIUDADANO',d:'IDU'},
+    {n:'Entrega Informe Final Componente de Arqueología',a:'ARQUEOLOGIA',d:'IDU'},
+    {n:'Entrega Informe Final Componente de PMT, Señalización y Desvío',a:'PMT',d:'IDU'},
+    {n:'Consolidado maquinaria y equipo – horas y mantenimientos (formatos IDU)',a:'MAQUINARIA',d:'IDU'},
+    {n:'FOAC-108, FOAC-43, FOAC-45, FOAC-47 consolidados finales',a:'MAQUINARIA',d:'Interventoría'},
+    {n:'Entrega Informe Final Componente de Calidad',a:'CALIDAD',d:'IDU'},
+    {n:'Entrega Informe Final Componente Biótico con consolidado mensual',a:'BIOTICO',d:'IDU'},
+    {n:'Anexos actas de comités, mesas de trabajo y recorridos (interventoría, IDU, SDA)',a:'BIOTICO',d:'IDU'},
+  ]
+};
+
+let data={contracts:[],cur:null,stage:'pre'};
+
+function load(){
+  try{const s=localStorage.getItem('idu_html_v1');if(s)data=JSON.parse(s);}catch(e){}
+  if(!data.contracts)data.contracts=[];
+  if(!data.contracts.length)addSample();
+  if(!data.cur)data.cur=data.contracts[0].id;
+  if(!data.stage)data.stage='pre';
+}
+function save(){try{localStorage.setItem('idu_html_v1',JSON.stringify(data));}catch(e){}}
+function mkId(){return 'i'+Date.now()+Math.random().toString(36).slice(2,6)}
+
+function addSample(){
+  const c={id:'c'+Date.now(),nombre:'Contrato IDU-1810-2021',numero:'1810-2021',tipo:'Construcción nueva vías',valor:'$ 4.500.000.000',fecha_inicio:'2021-10-01',fecha_fin:'2025-04-08',ents:{}};
+  STAGES.forEach(st=>{c.ents[st.id]=(BASE[st.id]||[]).map(e=>({id:mkId(),n:e.n,area:e.a,dest:e.d,estado:'Pendiente',fecha:'',doc:'',obs:''}));});
+  data.contracts.push(c);data.cur=c.id;
+}
+
+function getC(){return data.contracts.find(c=>c.id===data.cur)||data.contracts[0];}
+
+function renderAll(){renderSel();renderBar();renderMetrics();renderTabs();renderTable();}
+
+function renderSel(){
+  document.getElementById('contractSel').innerHTML=data.contracts.map(c=>`<option value="${c.id}"${c.id===data.cur?' selected':''}>${c.nombre}</option>`).join('');
+}
+function renderBar(){
+  const c=getC();
+  document.getElementById('contractBar').innerHTML=
+    `<div><span>Contrato: </span><strong>${c.nombre}</strong></div>
+     <div><span>N°: </span><strong>${c.numero||'-'}</strong></div>
+     <div><span>Tipo: </span><strong>${c.tipo||'-'}</strong></div>
+     <div><span>Valor: </span><strong>${c.valor||'-'}</strong></div>
+     <div><span>Inicio: </span><strong>${c.fecha_inicio||'-'}</strong></div>
+     <div><span>Fin: </span><strong>${c.fecha_fin||'-'}</strong></div>`;
+}
+function renderMetrics(){
+  const c=getC();
+  let tot=0,pend=0,rev=0,rad=0,apr=0,rech=0,venc=0;
+  const hoy=new Date();hoy.setHours(0,0,0,0);
+  STAGES.forEach(st=>(c.ents[st.id]||[]).forEach(e=>{
+    tot++;
+    if(e.estado==='Pendiente')pend++;
+    else if(e.estado==='En Revisión')rev++;
+    else if(e.estado==='Radicado')rad++;
+    else if(e.estado==='Aprobado')apr++;
+    else if(e.estado==='Rechazado')rech++;
+    if(e.fecha&&e.estado!=='Aprobado'&&new Date(e.fecha)<hoy)venc++;
+  }));
+  const pct=tot?Math.round(apr/tot*100):0;
+  document.getElementById('metrics').innerHTML=`
+    <div class="metric"><div class="metric-lbl">Total entregables</div><div class="metric-val mv-blue">${tot}</div></div>
+    <div class="metric"><div class="metric-lbl">Aprobados</div><div class="metric-val mv-green">${apr} <span style="font-size:13px">(${pct}%)</span></div></div>
+    <div class="metric"><div class="metric-lbl">Pendientes</div><div class="metric-val mv-gray">${pend}</div></div>
+    <div class="metric"><div class="metric-lbl">En revisión</div><div class="metric-val mv-blue">${rev}</div></div>
+    <div class="metric"><div class="metric-lbl">Radicados</div><div class="metric-val mv-amber">${rad}</div></div>
+    <div class="metric"><div class="metric-lbl">Rechazados</div><div class="metric-val mv-red">${rech}</div></div>
+    <div class="metric"><div class="metric-lbl">Vencidos</div><div class="metric-val mv-red">${venc}</div></div>`;
+}
+function renderTabs(){
+  document.getElementById('stageTabs').innerHTML=STAGES.map(s=>
+    `<div class="stab${s.id===data.stage?' active':''}" onclick="selStage('${s.id}')">${s.label}</div>`
+  ).join('');
+}
+function renderTable(){
+  const c=getC();
+  const st=STAGES.find(s=>s.id===data.stage);
+  document.getElementById('stageTitle').textContent=st?st.label:'';
+  let items=c.ents[data.stage]||[];
+  const fa=document.getElementById('filterArea');
+  const curArea=fa.value;
+  const areas=[...new Set(items.map(e=>e.area))].sort();
+  fa.innerHTML='<option value="">Todas</option>'+areas.map(a=>`<option value="${a}"${a===curArea?' selected':''}>${a}</option>`).join('');
+  const fArea=fa.value,fEst=document.getElementById('filterEstado').value,fDest=document.getElementById('filterDest').value;
+  if(fArea)items=items.filter(e=>e.area===fArea);
+  if(fEst)items=items.filter(e=>e.estado===fEst);
+  if(fDest)items=items.filter(e=>e.dest===fDest);
+  const apr=items.filter(e=>e.estado==='Aprobado').length;
+  const pct=items.length?Math.round(apr/items.length*100):0;
+  document.getElementById('progFill').style.width=pct+'%';
+  document.getElementById('progLbl').textContent=pct+'%';
+  const hoy=new Date();hoy.setHours(0,0,0,0);
+  const grouped={};
+  items.forEach(e=>{if(!grouped[e.area])grouped[e.area]=[];grouped[e.area].push(e);});
+  let html='';
+  Object.keys(grouped).sort().forEach(area=>{
+    html+=`<tr class="group-hdr"><td colspan="8"><span class="area-badge area-${area}">${area}</span> &nbsp;${grouped[area].length} entregables</td></tr>`;
+    grouped[area].forEach(e=>{
+      let fa2='';
+      if(e.fecha&&e.estado!=='Aprobado'){
+        const f=new Date(e.fecha);const diff=Math.ceil((f-hoy)/86400000);
+        if(diff<0)fa2=`<div class="avc">Vencido ${Math.abs(diff)}d</div>`;
+        else if(diff<=7)fa2=`<div class="av">Vence en ${diff}d</div>`;
+      }
+      html+=`<tr>
+        <td>${e.n}</td>
+        <td><span class="area-badge area-${e.area}">${e.area}</span></td>
+        <td style="font-size:10px">${e.dest}</td>
+        <td><select class="est-sel" onchange="upd('${e.id}','estado',this.value)">${ESTADOS.map(s=>`<option${e.estado===s?' selected':''}>${s}</option>`).join('')}</select></td>
+        <td><input type="date" class="fi" value="${e.fecha||''}" onchange="upd('${e.id}','fecha',this.value)">${fa2}</td>
+        <td><input type="text" class="fi" placeholder="N° radicado" value="${e.doc||''}" onchange="upd('${e.id}','doc',this.value)"></td>
+        <td><input type="text" class="fi" placeholder="Obs." value="${e.obs||''}" onchange="upd('${e.id}','obs',this.value)"></td>
+        <td><button class="del-btn" onclick="delE('${e.id}')">✕</button></td>
+      </tr>`;
+    });
+  });
+  document.getElementById('tBody').innerHTML=html||`<tr><td colspan="8" style="text-align:center;color:#aaa;padding:1.5rem">No hay entregables con los filtros seleccionados</td></tr>`;
+}
+
+function upd(id,field,val){
+  const c=getC();
+  STAGES.forEach(st=>{const e=(c.ents[st.id]||[]).find(x=>x.id===id);if(e)e[field]=val;});
+  save();renderMetrics();renderTable();
+}
+function delE(id){
+  if(!confirm('¿Eliminar este entregable?'))return;
+  const c=getC();
+  STAGES.forEach(st=>{c.ents[st.id]=(c.ents[st.id]||[]).filter(x=>x.id!==id);});
+  save();renderMetrics();renderTable();
+}
+function selContract(id){data.cur=id;data.stage='pre';save();renderAll();}
+function selStage(id){data.stage=id;save();renderTabs();renderTable();}
+
+function openNewEntregable(){
+  document.getElementById('modalArea').innerHTML=`
+  <div class="modal-bg" onclick="cm(event)"><div class="modal">
+    <h3>Nuevo entregable</h3>
+    <div class="fg"><label>Nombre del entregable</label><input id="nN" type="text" placeholder="Descripción del entregable"></div>
+    <div class="fr">
+      <div class="fg"><label>Área</label><select id="nA">${AREAS.map(a=>`<option>${a}</option>`).join('')}</select></div>
+      <div class="fg"><label>Destinatario</label><select id="nD">${DESTS.map(d=>`<option>${d}</option>`).join('')}</select></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label>Estado</label><select id="nE">${ESTADOS.map(s=>`<option>${s}</option>`).join('')}</select></div>
+      <div class="fg"><label>Fecha límite</label><input id="nF" type="date"></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label>Radicado / Documento</label><input id="nDoc" type="text" placeholder="N° o nombre"></div>
+      <div class="fg"><label>Observaciones</label><input id="nO" type="text" placeholder="Observaciones"></div>
+    </div>
+    <div class="mf">
+      <button class="btn" onclick="cmc()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveE()">Guardar</button>
+    </div>
+  </div></div>`;
+}
+function saveE(){
+  const n=document.getElementById('nN').value.trim();
+  if(!n){alert('Ingresa el nombre del entregable');return;}
+  const c=getC();
+  if(!c.ents[data.stage])c.ents[data.stage]=[];
+  c.ents[data.stage].push({id:mkId(),n,area:document.getElementById('nA').value,dest:document.getElementById('nD').value,estado:document.getElementById('nE').value,fecha:document.getElementById('nF').value,doc:document.getElementById('nDoc').value,obs:document.getElementById('nO').value});
+  save();cmc();renderMetrics();renderTable();
+}
+function openNewContract(){
+  document.getElementById('modalArea').innerHTML=`
+  <div class="modal-bg" onclick="cm(event)"><div class="modal">
+    <h3>Nuevo contrato</h3>
+    <div class="fr">
+      <div class="fg"><label>Nombre</label><input id="cN" type="text" placeholder="Contrato IDU-002"></div>
+      <div class="fg"><label>Número</label><input id="cNu" type="text" placeholder="IDU-LP-002-2024"></div>
+    </div>
+    <div class="fg"><label>Tipo</label><select id="cT">
+      <option>Construcción nueva vías</option><option>Mantenimiento vías</option>
+      <option>Mantenimiento espacio público</option><option>Construcción espacio público</option>
+      <option>Rehabilitación vial</option>
+    </select></div>
+    <div class="fg"><label>Valor</label><input id="cV" type="text" placeholder="$ 0.000.000.000"></div>
+    <div class="fr">
+      <div class="fg"><label>Fecha inicio</label><input id="cI" type="date"></div>
+      <div class="fg"><label>Fecha fin</label><input id="cF" type="date"></div>
+    </div>
+    <div class="mf">
+      <button class="btn" onclick="cmc()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveC()">Crear</button>
+    </div>
+  </div></div>`;
+}
+function saveC(){
+  const n=document.getElementById('cN').value.trim();
+  if(!n){alert('Ingresa el nombre');return;}
+  const c={id:'c'+Date.now(),nombre:n,numero:document.getElementById('cNu').value,tipo:document.getElementById('cT').value,valor:document.getElementById('cV').value,fecha_inicio:document.getElementById('cI').value,fecha_fin:document.getElementById('cF').value,ents:{}};
+  STAGES.forEach(st=>{c.ents[st.id]=(BASE[st.id]||[]).map(e=>({id:mkId(),n:e.n,area:e.a,dest:e.d,estado:'Pendiente',fecha:'',doc:'',obs:''}));});
+  data.contracts.push(c);data.cur=c.id;data.stage='pre';
+  save();cmc();renderAll();
+}
+
+function exportCSV(){
+  const c=getC();
+  let csv='Etapa,Area,Entregable,Destinatario,Estado,Fecha Limite,Radicado/Doc,Observaciones\n';
+  STAGES.forEach(st=>{
+    (c.ents[st.id]||[]).forEach(e=>{
+      const row=[st.label,e.area,`"${e.n}"`,e.dest,e.estado,e.fecha||'',`"${e.doc||''}"`,`"${e.obs||''}"`];
+      csv+=row.join(',')+'\n';
+    });
+  });
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=`Entregables_${c.nombre.replace(/\s/g,'_')}.csv`;
+  a.click();URL.revokeObjectURL(url);
+}
+
+function cm(e){if(e.target.classList.contains('modal-bg'))cmc();}
+function cmc(){document.getElementById('modalArea').innerHTML='';}
+
+load();renderAll();
+</script>
+</body>
+</html>
